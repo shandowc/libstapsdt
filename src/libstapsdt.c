@@ -186,10 +186,19 @@ int probeIsEnabled(SDTProbe_t *probe) {
   if(probe->_fire == NULL) {
     return 0;
   }
-  if(((*(char *)probe->_fire) & 0x90) == 0x90) {
+#if defined(__x86_64__)
+  if(*(char *)probe->_fire == (char)0x90) {
     return 0;
   }
   return 1;
+#elif defined(__aarch64__)
+  if(*(int32_t *)probe->_fire == (int32_t)0xd503201f) {
+    return 0;
+  }
+  return 1;
+#else
+  return 0;
+#endif
 }
 
 void providerDestroy(SDTProvider_t *provider) {

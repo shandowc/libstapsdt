@@ -33,6 +33,21 @@ Elf *createElf(int fd) {
    return 0;
 }
 
+inline static int getTargetElfMachine()
+{
+#if defined(__arm__)
+    return EM_ARM;
+#elif defined(__aarch64__)
+    return EM_AARCH64;
+#elif defined(__i386__)
+    return EM_386;
+#elif defined(__mips__)
+    return EM_MIPS;
+#elif defined(__x86_64__)
+    return EM_X86_64;
+#endif
+}
+
 Elf64_Ehdr *createElfHeader(Elf *elf) {
   Elf64_Ehdr *ehdr;
   if ((ehdr = elf64_newehdr(elf)) == NULL) {
@@ -42,13 +57,7 @@ Elf64_Ehdr *createElfHeader(Elf *elf) {
 
   ehdr->e_ident[EI_DATA] = ELFDATA2LSB;
   ehdr->e_type = ET_DYN;
-#if defined(__x86_64__) || defined(_M_X64)
-  ehdr->e_machine = EM_X86_64;
-#elif defined(__aarch64__) || defined(_M_ARM64)
-  ehdr->e_machine = EM_AARCH64;
-#else
-#error Unsupported architecture
-#endif
+  ehdr->e_machine = getTargetElfMachine();
   ehdr->e_version = EV_CURRENT;
   ehdr->e_flags = 0;
 

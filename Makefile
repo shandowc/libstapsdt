@@ -4,6 +4,8 @@ CFLAGS= -std=gnu11
 LDFLAGS=-lelf -ldl -Wl,-z,noexecstack
 VERSION=0.1.0
 
+ARCH = $(shell $(CC) -dumpmachine  | cut -d '-' -f 1 )
+
 PREFIX=/usr
 
 OBJECTS = $(patsubst src/%.c, build/lib/%.o, $(wildcard src/*.c))
@@ -26,7 +28,7 @@ uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/lib/$(SOLINK)
 	rm -f $(DESTDIR)$(PREFIX)/include/libstapsdt.h
 
-build/lib/libstapsdt-x86_64.o: src/asm/libstapsdt-x86_64.s
+build/lib/libstapsdt-$(ARCH).o: src/asm/libstapsdt-$(ARCH).s
 	mkdir -p build
 	$(CC) $(CFLAGS) -fPIC -c $^ -o $@
 
@@ -34,11 +36,11 @@ build/lib/%.o: src/%.c $(HEADERS)
 	mkdir -p build/lib/
 	$(CC) $(CFLAGS) -fPIC -c $< -o $@
 
-out/libstapsdt.a: $(OBJECTS) build/lib/libstapsdt-x86_64.o
+out/libstapsdt.a: $(OBJECTS) build/lib/libstapsdt-$(ARCH).o
 	mkdir -p out
 	ar rcs $@ $^
 
-out/$(SONAME): $(OBJECTS) build/lib/libstapsdt-x86_64.o
+out/$(SONAME): $(OBJECTS) build/lib/libstapsdt-$(ARCH).o
 	mkdir -p out
 	$(CC) $(CFLAGS) -shared -Wl,-soname=$(SONAME) -o $@ $^ $(LDFLAGS)
 

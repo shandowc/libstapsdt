@@ -8,7 +8,7 @@
 
 // TODO (mmarchini) add other architectures (this only works for x86_64 and ARM64)
 char *regMap(int idx) {
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__x86_64__)
     switch (idx) {
       case 0:
       return "%rdi";
@@ -31,7 +31,7 @@ char *regMap(int idx) {
       default:
         return NULL;
     }
-#elif defined(__aarch64__) || defined(_M_ARM64)
+#elif defined(__aarch64__)
     switch (idx) {
       case 0:
       return "x0";
@@ -60,8 +60,6 @@ char *regMap(int idx) {
       default:
         return NULL;
     }
-#else
-#error Unsupported architecture
 #endif
 }
 
