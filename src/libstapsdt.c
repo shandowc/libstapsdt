@@ -49,11 +49,8 @@ SDTProvider_t *providerInit(const char *name) {
   return provider;
 }
 
-SDTProbe_t *providerAddProbe(SDTProvider_t *provider, const char *name, int argCount, ...) {
+SDTProbe_t *providerAddProbe(SDTProvider_t *provider, const char *name, int argCount) {
   int i;
-  va_list vl;
-  ArgType_t arg;
-  va_start(vl, argCount);
 
   SDTProbeList_t *probeList = (SDTProbeList_t *) calloc(sizeof(SDTProbeList_t), 1);
   probeList->probe._fire = NULL;
@@ -67,12 +64,11 @@ SDTProbe_t *providerAddProbe(SDTProvider_t *provider, const char *name, int argC
   probeList->probe.argCount = argCount;
 
   for(i=0; i < argCount; i++) {
-    arg = va_arg(vl, ArgType_t);
-    probeList->probe.argFmt[i] = arg;
+    probeList->probe.argFmt[i] = sizeof(void *);
   }
 
   for(; i<MAX_ARGUMENTS; i++) {
-    probeList->probe.argFmt[i] = noarg;
+    probeList->probe.argFmt[i] = 0;
   }
 
   probeList->probe.provider = provider;
